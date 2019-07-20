@@ -300,7 +300,7 @@ def model_fn_builder(mcf_config, init_checkpoint, learning_rate,
 
         if mode == tf.estimator.ModeKeys.TRAIN:
 
-            train_op = optimization.create_optimizer(
+            train_op = optimization.create_adam_optimizer(
                 loss, learning_rate, num_train_steps, num_warmup_steps, False)
 
             output_spec = tf.estimator.EstimatorSpec(
