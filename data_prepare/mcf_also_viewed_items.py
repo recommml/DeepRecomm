@@ -25,7 +25,7 @@ flags.DEFINE_string(
     "item_hash_map")
 
 
-def load_hashmap():
+def load_hash_map():
     hash_map = dict()
     with open(FLAGS.item_hash_map, "r") as f:
         for each in f.readlines():
@@ -51,7 +51,7 @@ def also_viewed_data_generator(hash_map):
 
 
 def main(_):
-    hash_map = load_hashmap()
+    hash_map = load_hash_map()
     with open(FLAGS.output_data, 'w') as g:
         for line in also_viewed_data_generator(hash_map):
             g.write(line + '\n')
