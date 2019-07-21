@@ -29,14 +29,14 @@ def load_hash_map(path):
     hash_map = dict()
     with open(path, "r") as f:
         for each in f.readlines():
-            hash_map[each.split(":")[0]] = each.split(":")[1]
+            hash_map[each.split(":")[0]] = each.split(":")[1].strip()
     return hash_map
 
 
 def user_item_data_generator(item_hash_map, user_hash_map):
     with open(FLAGS.input_data, 'r') as f:
         for each in f.readlines():
-            data = json.loads(each)
+            data = json.loads(each.strip(), strict=False)
             item_id = item_hash_map[data['asin']]
             rate = data['overall']
             user_id = user_hash_map[data['reviewerID']]
