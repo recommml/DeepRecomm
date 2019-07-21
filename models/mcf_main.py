@@ -13,11 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """BERT finetuning runner."""
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import os
 import mcf_modeling
 import optimization
@@ -188,8 +183,8 @@ def file_based_input_fn_builder(user_item_files, also_view_files, is_training, b
                     tf.TensorShape([None]),  # also_view_ids
                     tf.TensorShape([None]),  # items_ids mask
                     tf.TensorShape([None]),  # also_view_mask
-                    tf.TensorShape([]), # user_id
-                    tf.TensorShape([])),  # item_id
+                    tf.TensorShape([None]),  # user_id
+                    tf.TensorShape([None])),  # item_id
                 # Pad the source sequences with eos tokens.
                 # (Though notice we don't generally need to do this since
                 # later on we will be masking out calculations past the true sequence.
@@ -199,21 +194,21 @@ def file_based_input_fn_builder(user_item_files, also_view_files, is_training, b
                     PAD_ID,
                     PAD_ID,
                     PAD_ID,
-                    0,
-                    0))  # src_len -- unused
+                    PAD_ID,
+                    PAD_ID))  # src_len -- unused
 
         batched_dataset = batching_func(d)
-        features = batched_dataset.map(lambda item_ids, rates, also_view_ids, items_mask, also_view_mask,
-                                              user_id, item_id:
-        {
-            "item_ids": item_ids,
-            "rates": rates,
-            "also_view_ids": also_view_ids,
-            "items_mask": items_mask,
-            "also_view_mask": also_view_mask,
-            "user_id": user_id,
-            "item_id": item_id
-        })
+        features = \
+            batched_dataset.map(lambda item_ids, rates, also_view_ids, items_mask, also_view_mask, user_id, item_id:
+                                {
+                                    "item_ids": item_ids,
+                                    "rates": rates,
+                                    "also_view_ids": also_view_ids,
+                                    "items_mask": items_mask,
+                                    "also_view_mask": also_view_mask,
+                                    "user_id": user_id,
+                                    "item_id": item_id
+                                })
 
         return features
 
@@ -255,8 +250,8 @@ def create_model(mcf_config, user_id, item_id, item_ids, also_view_ids, rates, i
 
         reg_losses = tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)
 
-        loss = tf.reduce_mean((user_item_loss + FLAGS.also_view_ratio * also_view_loss))\
-               + FLAGS.l2_penalty * tf.reduce_mean(reg_losses)
+        loss = tf.reduce_mean((user_item_loss + FLAGS.also_view_ratio * also_view_loss)) + \
+            FLAGS.l2_penalty * tf.reduce_mean(reg_losses)
 
         return model, loss, user_item_loss, also_view_loss
 
@@ -444,8 +439,10 @@ def main(_):
     if FLAGS.do_predict:
 
         predict_files = os.listdir(FLAGS.data_dir)
-        user_item_eval_files = [os.path.join(FLAGS.data_dir, path) for path in predict_files if "user_item_pred" in path]
-        also_view_eval_files = [os.path.join(FLAGS.data_dir, path) for path in predict_files if "also_view_pred" in path]
+        user_item_eval_files = \
+            [os.path.join(FLAGS.data_dir, path) for path in predict_files if "user_item_pred" in path]
+        also_view_eval_files = \
+            [os.path.join(FLAGS.data_dir, path) for path in predict_files if "also_view_pred" in path]
 
         tf.logging.info("***** Running prediction*****")
 
@@ -462,7 +459,7 @@ def main(_):
         user_embedding_file = os.path.join(FLAGS.output_dir, "user_embedding.tsv")
         item_embedding_file = os.path.join(FLAGS.output_dir, "item_embedding.tsv")
 
-        with tf.gfile.GFile(user_embedding_file, "w") as writer_1, tf.gfile.GFile(item_embedding_file, 'w') as writer_2 :
+        with tf.gfile.GFile(user_embedding_file, "w") as writer_1, tf.gfile.GFile(item_embedding_file, 'w') as writer_2:
             num_written_lines = 0
             tf.logging.info("***** Predict results *****")
             for (i, prediction) in enumerate(result):

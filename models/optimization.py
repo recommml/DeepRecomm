@@ -14,10 +14,6 @@
 # limitations under the License.
 """Functions and classes related to optimization (weight updates)."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import re
 import tensorflow as tf
 from tensorflow.python.eager import context
@@ -84,7 +80,7 @@ def create_adam_optimizer(loss, init_lr, num_train_steps, num_warmup_steps, use_
     # However, `AdamWeightDecayOptimizer` doesn't do this. But if you use
     # a different optimizer, you should probably take this line out.
     # new_global_step = global_step + 1
-    #train_op = tf.group(train_op, [global_step.assign(new_global_step)])
+    # train_op = tf.group(train_op, [global_step.assign(new_global_step)])
     return train_op
 
 
@@ -146,7 +142,8 @@ def create_adam_weight_decay_optimizer(loss, init_lr, num_train_steps, num_warmu
     # However, `AdamWeightDecayOptimizer` doesn't do this. But if you use
     # a different optimizer, you should probably take this line out.
     # new_global_step = global_step + 1
-    #train_op = tf.group(train_op, [global_step.assign(new_global_step)])
+    # train_op = tf.group(train_op, [global_step.assign(new_global_step)])
+
     return train_op
 
 

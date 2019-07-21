@@ -12,11 +12,6 @@ flags.DEFINE_string(
 
 
 flags.DEFINE_string(
-    "output_data", None,
-    "output_file")
-
-
-flags.DEFINE_string(
     "item_hash_map", None,
     "item_hash_map")
 
@@ -72,7 +67,6 @@ def main(_):
 
 if __name__ == '__main__':
     flags.mark_flag_as_required("input_data")
-    flags.mark_flag_as_required("output_data")
     flags.mark_flag_as_required("item_hash_map")
     flags.mark_flag_as_required("user_hash_map")
 
