@@ -28,12 +28,12 @@ def load_hash_map(path):
     return hash_map
 
 
-def user_item_data_generator(item_hash_map, user_hash_map):
+def user_item_data_generator():
     with open(FLAGS.input_data, 'r') as f:
         for each in f.readlines():
             data = json.loads(each)
-            item_id = item_hash_map[data['asin']]
-            user_id = user_hash_map[data['reviewerID']]
+            item_id = data['asin']
+            user_id = data['reviewerID']
             yield user_id, item_id
 
 
@@ -42,7 +42,7 @@ def main(_):
     user_hash_map = dict()
     item_count = 0
     user_count = 0
-    for user_id, item_id in user_item_data_generator(item_hash_map, user_hash_map):
+    for user_id, item_id in user_item_data_generator():
         if item_id not in item_hash_map:
             item_hash_map[item_id] = str(item_count)
             item_count += 1
