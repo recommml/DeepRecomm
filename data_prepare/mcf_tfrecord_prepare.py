@@ -105,11 +105,11 @@ def main(_):
                                     .format(FLAGS.also_view, i, pred_shards))
                        for i in range(pred_shards)]
 
-    also_view_train_generator = user_item_example_generator(FLAGS.tmp_dir, "train")
+    also_view_train_generator = also_view_example_generator(FLAGS.tmp_dir, "train")
 
-    also_view_dev_generator = user_item_example_generator(FLAGS.tmp_dir, "dev")
+    also_view_dev_generator = also_view_example_generator(FLAGS.tmp_dir, "dev")
 
-    also_view_pred_generator = user_item_example_generator(FLAGS.tmp_dir, "pred")
+    also_view_pred_generator = also_view_example_generator(FLAGS.tmp_dir, "pred")
 
     generator_utils.generate_files(also_view_train_generator, also_view_train_file_names, cycle_every_n=10)
 
