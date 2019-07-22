@@ -37,10 +37,11 @@ def user_item_data_generator(item_hash_map, user_hash_map):
     with open(FLAGS.input_data, 'r') as f:
         for each in f.readlines():
             data = json.loads(each.strip(), strict=False)
-            item_id = item_hash_map[data['asin']]
-            rate = data['overall']
-            user_id = user_hash_map[data['reviewerID']]
-            yield user_id, item_id, float(rate)
+            if data['asin'] in item_hash_map:
+                item_id = item_hash_map[data['asin']]
+                rate = data['overall']
+                user_id = user_hash_map[data['reviewerID']]
+                yield user_id, item_id, float(rate)
 
 
 def main(_):
@@ -48,9 +49,10 @@ def main(_):
     user_hash_map = load_hash_map(FLAGS.user_hash_map)
     result_map = dict()
     for user_id, item_id, rate in user_item_data_generator(item_hash_map, user_hash_map):
-        if user_id not in result_map:
-            result_map[user_id] = []
-        result_map[user_id].append(item_id + ':' + str(rate / 5))
+        if item_id != '':
+            if user_id not in result_map:
+                result_map[user_id] = []
+            result_map[user_id].append(item_id + ':' + str(rate / 5))
     with open(FLAGS.output_data, 'w') as g:
         for key, value in result_map.items():
             g.write(key)
