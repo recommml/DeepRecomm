@@ -30,7 +30,12 @@ flags.DEFINE_boolean(
     "user_hash_map")
 
 flags.DEFINE_integer(
-    "threshold", 5,
+    "item_threshold", 5,
+    "user_hash_map")
+
+
+flags.DEFINE_integer(
+    "user_threshold", 5,
     "user_hash_map")
 
 
@@ -48,19 +53,26 @@ def also_view_data_generator():
         for each in f.readlines():
             data = ast.literal_eval(each)
             item_id = data['asin']
+            flag = False
+            count = 0
             if 'related' in data:
                 if 'also_viewed' in data['related']:
                     for item in data['related']['also_viewed']:
-                        yield item
+                        flag = True
+                        count += 1
+                        yield item, flag, 1
             if FLAGS.also_bought and 'related' in data:
                 if 'also_bought' in data['related']:
                     for item in data['related']['also_bought']:
-                        yield item
-            yield item_id
+                        flag = True
+                        count += 1
+                        yield item, flag, 1
+            yield item_id, flag, count
 
 
 def main(_):
     item_hash_map = dict()
+    reserved_item_list = []
     user_hash_map = dict()
     item_count = 0
     user_count = 0
@@ -72,14 +84,16 @@ def main(_):
             user_hash_map[user_id] = 0
         user_hash_map[user_id] += 1
 
-    for item_id in also_view_data_generator():
+    for item_id, flag, count in also_view_data_generator():
         if item_id not in item_hash_map:
             item_hash_map[item_id] = 0
-        item_hash_map[item_id] += 1
+        item_hash_map[item_id] += count
+        if flag:
+            reserved_item_list.append(item_id)
 
     with open(FLAGS.item_hash_map, 'w') as g:
         for key, value in item_hash_map.items():
-            if value >= FLAGS.threshold:
+            if value >= FLAGS.item_threshold or key in reserved_item_list:
                 g.write(key)
                 g.write(':')
                 g.write(str(item_count))
@@ -88,11 +102,12 @@ def main(_):
 
     with open(FLAGS.user_hash_map, 'w') as g:
         for key, value in user_hash_map.items():
-            g.write(key)
-            g.write(':')
-            g.write(str(user_count))
-            g.write('\n')
-            user_count += 1
+            if value >= FLAGS.user_threshold:
+                g.write(key)
+                g.write(':')
+                g.write(str(user_count))
+                g.write('\n')
+                user_count += 1
 
 
 if __name__ == '__main__':
