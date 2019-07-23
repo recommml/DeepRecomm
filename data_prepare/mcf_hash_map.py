@@ -72,7 +72,7 @@ def also_view_data_generator():
 
 def main(_):
     item_hash_map = dict()
-    reserved_item_list = []
+    reserved_item_list = set()
     user_hash_map = dict()
     item_count = 0
     user_count = 0
@@ -89,7 +89,7 @@ def main(_):
             item_hash_map[item_id] = 0
         item_hash_map[item_id] += count
         if flag:
-            reserved_item_list.append(item_id)
+            reserved_item_list.add(item_id)
 
     with open(FLAGS.item_hash_map, 'w') as g:
         for key, value in item_hash_map.items():

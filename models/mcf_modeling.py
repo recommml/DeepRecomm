@@ -101,7 +101,7 @@ class MCFModel(object):
         config = copy.deepcopy(config)
 
         with tf.variable_scope(scope, default_name="MCF"):
-            with tf.variable_scope("embeddings"):
+            with tf.variable_scope("embeddings", reuse=tf.AUTO_REUSE):
                 # Perform embedding lookup on user_id
                 (self.user_embedding_output, self.user_embedding_table) = embedding_lookup(
                     input_ids=user_id,

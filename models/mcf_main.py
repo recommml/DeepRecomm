@@ -49,9 +49,9 @@ flags.DEFINE_string(
     "Initial checkpoint (usually from a pre-trained BERT model).")
 
 
-flags.DEFINE_bool("do_train", False, "Whether to run training.")
+flags.DEFINE_bool("do_train", True, "Whether to run training.")
 
-flags.DEFINE_bool("do_eval", False, "Whether to run training.")
+flags.DEFINE_bool("do_eval", True, "Whether to run training.")
 
 flags.DEFINE_bool(
     "do_predict", False,
@@ -165,8 +165,8 @@ def file_based_input_fn_builder(user_item_files, also_view_files, is_training, b
             item_ids,
             rates,
             also_view_ids,
-            tf.ones_like(item_ids),
-            tf.ones_like(also_view_ids),
+            tf.ones_like(item_ids, dtype=tf.float32),
+            tf.ones_like(also_view_ids,  dtype=tf.float32),
             user_id,
             item_id
         ))
@@ -190,10 +190,10 @@ def file_based_input_fn_builder(user_item_files, also_view_files, is_training, b
                 # later on we will be masking out calculations past the true sequence.
                 padding_values=(
                     PAD_ID,  # src
+                    float(PAD_ID),
                     PAD_ID,
-                    PAD_ID,
-                    PAD_ID,
-                    PAD_ID,
+                    float(PAD_ID),
+                    float(PAD_ID),
                     PAD_ID,
                     PAD_ID))  # src_len -- unused
 
@@ -366,8 +366,8 @@ def main(_):
 
     if FLAGS.do_train:
         train_files = os.listdir(FLAGS.data_dir)
-        user_item_train_files = [os.path.join(FLAGS.data_dir, path) for path in train_files if "user_item_train"in path]
-        also_view_train_files = [os.path.join(FLAGS.data_dir, path) for path in train_files if "also_view_train"in path]
+        user_item_train_files = [os.path.join(FLAGS.data_dir, path) for path in train_files if "user_item-train"in path]
+        also_view_train_files = [os.path.join(FLAGS.data_dir, path) for path in train_files if "also_view-train"in path]
 
         tf.logging.info("***** Running training *****")
         tf.logging.info("  Batch size = %d", FLAGS.train_batch_size)
@@ -385,8 +385,8 @@ def main(_):
         )
 
         eval_files = os.listdir(FLAGS.data_dir)
-        user_item_eval_files = [os.path.join(FLAGS.data_dir, path) for path in eval_files if "user_item_dev" in path]
-        also_view_eval_files = [os.path.join(FLAGS.data_dir, path) for path in eval_files if "also_view_dev" in path]
+        user_item_eval_files = [os.path.join(FLAGS.data_dir, path) for path in eval_files if "user_item-dev" in path]
+        also_view_eval_files = [os.path.join(FLAGS.data_dir, path) for path in eval_files if "also_view-dev" in path]
         # This tells the estimator to run through the entire set.
 
         # However, if running eval on the TPU, you will need to specify the
@@ -412,8 +412,8 @@ def main(_):
 
     if FLAGS.do_eval:
         eval_files = os.listdir(FLAGS.data_dir)
-        user_item_eval_files = [os.path.join(FLAGS.data_dir, path) for path in eval_files if "user_item_dev" in path]
-        also_view_eval_files = [os.path.join(FLAGS.data_dir, path) for path in eval_files if "also_view_dev" in path]
+        user_item_eval_files = [os.path.join(FLAGS.data_dir, path) for path in eval_files if "user_item-dev" in path]
+        also_view_eval_files = [os.path.join(FLAGS.data_dir, path) for path in eval_files if "also_view-dev" in path]
 
         # This tells the estimator to run through the entire set.
         eval_steps = None
@@ -440,9 +440,9 @@ def main(_):
 
         predict_files = os.listdir(FLAGS.data_dir)
         user_item_eval_files = \
-            [os.path.join(FLAGS.data_dir, path) for path in predict_files if "user_item_pred" in path]
+            [os.path.join(FLAGS.data_dir, path) for path in predict_files if "user_item-pred" in path]
         also_view_eval_files = \
-            [os.path.join(FLAGS.data_dir, path) for path in predict_files if "also_view_pred" in path]
+            [os.path.join(FLAGS.data_dir, path) for path in predict_files if "also_view-pred" in path]
 
         tf.logging.info("***** Running prediction*****")
 
@@ -481,6 +481,6 @@ def main(_):
 
 if __name__ == "__main__":
     flags.mark_flag_as_required("data_dir")
-    flags.mark_flag_as_required("bert_config_file")
+    flags.mark_flag_as_required("mcf_config_file")
     flags.mark_flag_as_required("output_dir")
     tf.app.run()

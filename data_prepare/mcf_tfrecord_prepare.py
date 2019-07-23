@@ -60,7 +60,7 @@ def also_view_example_generator(dir_name, tag="train"):
 
 
 def main(_):
-    train_shards = 100
+    train_shards = 10
     dev_shards = 1
     pred_shards = 1
     user_item_train_file_names = [os.path.join(FLAGS.data_dir, "{0}-train-000{1}-of-00{2}"
@@ -128,6 +128,5 @@ if __name__ == '__main__':
     flags.mark_flag_as_required("data_dir")
     flags.mark_flag_as_required("user_item")
     flags.mark_flag_as_required("also_view")
-    flags.mark_flag_as_required("vocab")
     flags.mark_flag_as_required("tmp_dir")
     tf.app.run()
