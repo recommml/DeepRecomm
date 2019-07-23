@@ -306,9 +306,8 @@ def model_fn_builder(mcf_config, init_checkpoint, learning_rate,
         elif mode == tf.estimator.ModeKeys.EVAL:
 
             eval_metrics = {
-                    "loss": loss,
-                    "user_item_loss": tf.reduce_mean(user_item_loss),
-                    "also_view_loss": tf.reduce_mean(also_view_loss)
+                    "user_item_loss": tf.metrics.mean(user_item_loss),
+                    "also_view_loss": tf.metrics.mean(also_view_loss)
                 }
 
             output_spec = tf.estimator.EstimatorSpec(
